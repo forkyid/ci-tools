@@ -1,8 +1,14 @@
 #!/bin/bash
 set -u
 
+# variables
+REVISION=$CIRCLE_SHA1
 docker_tag_args=""
-IFS="," read -ra DOCKER_TAGS \<<< "$CIRCLE_SHA1"
+
+# list of tags
+# tags=("$REVISION")
+
+IFS="," read -ra DOCKER_TAGS \<< "$REVISION"
 if [ $CIRCLE_BRANCH = 'development' ]; then
   for tag in "${DOCKER_TAGS[@]}"; do
     docker_tag_args="$docker_tag_args -t $AWS_ECR_ACCOUNT_URL/sgg-dev-${SERVICE_NAME}:$tag"
