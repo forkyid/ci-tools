@@ -1,5 +1,4 @@
 # #!/bin/bash
-set -u
 
 STAGE=""
 case $CIRCLE_BRANCH in
@@ -18,7 +17,6 @@ production)
 esac
 
 REVISION=$CIRCLE_SHA1
-DOCKER_TAG_ARGS=""
 REPOSITORY="${AWS_ECR_ACCOUNT_URL}/sgg-${STAGE}-${SERVICE_NAME}"
 DOCKER_TAG=""
 
@@ -27,6 +25,8 @@ for tag in "${DOCKER_TAGS[@]}"; do
   DOCKER_TAG=$tag
 done
 
-# build and push image
+# Build docker image
 docker build -f docker/Dockerfile-${STAGE} -t ${REPOSITORY}:${DOCKER_TAG} .
+
+# Push image to Amazon ECR
 docker push ${REPOSITORY}:${DOCKER_TAG}
