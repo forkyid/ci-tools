@@ -3,11 +3,8 @@ set -u
 
 # variables
 REVISION=$CIRCLE_SHA1
+
 docker_tag_args=""
-
-# list of tags
-# tags=("$REVISION")
-
 IFS="," read -ra DOCKER_TAGS \<< "$REVISION"
 if [ $CIRCLE_BRANCH = 'development' ]; then
   for tag in "${DOCKER_TAGS[@]}"; do
