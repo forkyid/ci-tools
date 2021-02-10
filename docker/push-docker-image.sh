@@ -1,31 +1,35 @@
 # #!/bin/bash
 set -u
 
+STAGE=""
+case $CIRCLE_BRANCH in
+development)
+  STAGE="dev"
+  break
+  ;;
+staging)
+  STAGE="stg"
+  break
+  ;;
+production)
+  STAGE="prd"
+  break
+  ;;
+esac
+
 REVISION=$CIRCLE_SHA1
+DOCKER_TAG_ARGS=""
+REPOSITORY="${AWS_ECR_ACCOUNT_URL}/sgg-${STAGE}-${SERVICE_NAME}"
+
 IFS="," read -ra DOCKER_TAGS <<< "$REVISION"
-docker_tag_args=""
-if [ $CIRCLE_BRANCH = 'development' ]; then
-  for tag in "${DOCKER_TAGS[@]}"; do
-    docker_tag_args="$docker_tag_args -t $AWS_ECR_ACCOUNT_URL/sgg-dev-${SERVICE_NAME}:$tag"
-  done
-  # echo docker_tag_args
-  docker build -f docker/Dockerfile-dev $docker_tag_args .
+for tag in "${DOCKER_TAGS[@]}"; do
+  DOCKER_TAG_ARGS="$DOCKER_TAG_ARGS -t $REPOSITORY:$tag"
+done
 
-  for tag in "${DOCKER_TAGS[@]}"; do
-    docker push $AWS_ECR_ACCOUNT_URL/sgg-dev-${SERVICE_NAME}:${tag}
-  done
-fi
+# build image
+docker build -f docker/Dockerfile-${STAGE} $DOCKER_TAG_ARGS .
 
-# if [ $CIRCLE_BRANCH = 'development' ]; then
+for tag in "${DOCKER_TAGS[@]}"; do
+  docker push ${REPOSITORY}:${tag}
+done
 
-# fi
-# if [ $CIRCLE_BRANCH = 'staging' ]; then
-#   for tag in "${DOCKER_TAGS[@]}"; do
-#     docker push $AWS_ECR_ACCOUNT_URL/sgg-stg-${SERVICE_NAME}:${tag}
-#   done
-# fi
-# if [ $CIRCLE_BRANCH = 'master' ]; then
-#   for tag in "${DOCKER_TAGS[@]}"; do
-#     docker push $AWS_ECR_ACCOUNT_URL/sgg-prd-${SERVICE_NAME}:${tag}
-#   done
-# fi
