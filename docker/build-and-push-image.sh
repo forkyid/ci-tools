@@ -1,4 +1,4 @@
-# #!/bin/bash
+#!/bin/bash
 
 STAGE=""
 case $CIRCLE_BRANCH in
