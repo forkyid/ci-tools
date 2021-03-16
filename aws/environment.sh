@@ -16,4 +16,7 @@ production)
   ;;
 esac
 
-aws s3 cp "s3://sgg-${STAGE}-environment/${SERVICE_NAME}/${APP_VERSION}/.env" .
+if [ "$CIRCLE_BRANCH" = "development" ] || [ "$CIRCLE_BRANCH" = "staging" ] || [ "$CIRCLE_BRANCH" = "master" ]
+then
+  aws s3 cp "s3://sgg-${STAGE}-environment/${SERVICE_NAME}/${APP_VERSION}/.env" .
+fi

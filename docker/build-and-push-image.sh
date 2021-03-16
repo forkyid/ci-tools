@@ -16,17 +16,20 @@ production)
   ;;
 esac
 
-REVISION=$CIRCLE_SHA1
-REPOSITORY="${AWS_ECR_ACCOUNT_URL}/sgg-${STAGE}-${SERVICE_NAME}"
-DOCKER_TAG=""
+if [ "$CIRCLE_BRANCH" = "development" ] || [ "$CIRCLE_BRANCH" = "staging" ] || [ "$CIRCLE_BRANCH" = "master" ]
+then
+  REVISION=$CIRCLE_SHA1
+  REPOSITORY="${AWS_ECR_ACCOUNT_URL}/sgg-${STAGE}-${SERVICE_NAME}"
+  DOCKER_TAG=""
 
-IFS="," read -ra DOCKER_TAGS <<< "$REVISION"
-for tag in "${DOCKER_TAGS[@]}"; do
-  DOCKER_TAG=$tag
-done
+  IFS="," read -ra DOCKER_TAGS <<< "$REVISION"
+  for tag in "${DOCKER_TAGS[@]}"; do
+    DOCKER_TAG=$tag
+  done
 
-# Build docker image
-docker build -f docker/Dockerfile-${STAGE} -t ${REPOSITORY}:${DOCKER_TAG} .
+  # Build docker image
+  docker build -f docker/Dockerfile-${STAGE} -t ${REPOSITORY}:${DOCKER_TAG} .
 
-# Push image to Amazon ECR
-docker push ${REPOSITORY}:${DOCKER_TAG}
+  # Push image to Amazon ECR
+  docker push ${REPOSITORY}:${DOCKER_TAG}
+fi

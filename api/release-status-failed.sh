@@ -21,4 +21,7 @@ production)
   ;;
 esac
 
-curl --location --request PATCH $API --header "Authorization: Basic $BASIC_AUTH" --header 'Content-Type: application/json' --data-raw "{\"workflow_name\": \"$WORKFLOW_NAME\", \"workflow_id\": \"$CIRCLE_WORKFLOW_ID\", \"job_id\": \"$CIRCLE_WORKFLOW_JOB_ID\", \"stage\": \"$STAGE\", \"project_name\": \"$SERVICE_NAME\", \"release_status\": \"failed\"}"
+if [ "$CIRCLE_BRANCH" = "development" ] || [ "$CIRCLE_BRANCH" = "staging" ] || [ "$CIRCLE_BRANCH" = "master" ]
+then
+  curl --location --request PATCH $API --header "Authorization: Basic $BASIC_AUTH" --header 'Content-Type: application/json' --data-raw "{\"workflow_name\": \"$WORKFLOW_NAME\", \"workflow_id\": \"$CIRCLE_WORKFLOW_ID\", \"job_id\": \"$CIRCLE_WORKFLOW_JOB_ID\", \"stage\": \"$STAGE\", \"project_name\": \"$SERVICE_NAME\", \"release_status\": \"failed\"}"
+fi
